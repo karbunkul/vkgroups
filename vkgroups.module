@@ -1,0 +1,85 @@
+<?php
+
+function vkgroups_menu(){
+  $items = array();
+  
+  $items['admin/config/karbunkul'] = array(
+    'title' => 'Karbunkul',
+    'description' => '',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  
+  $items['admin/config/karbunkul/vkgroups'] = array(
+    'title' => 'VK Groups Widget',
+    'description' => 'The groups widget links your site with a corresponding community on VK',
+    'access callback' => TRUE,
+    'page callback' => 'page_settings',
+    
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+}
+
+function page_settings(){
+  $out['link'] = array(
+    '#type' => 'markup',
+    '#markup' => 'Configure widgets on <a href="https://vk.com/developers.php?oid=-17680044&p=Groups" target="_blank">vk.com</a>',
+  );
+  $out['form'] = drupal_get_form('vkgroups_settings_form');
+  return $out;
+}
+
+
+function vkgroups_settings_form($form){
+  $form['settings'] = array(
+    '#type' => 'textarea',
+    '#rows' => 8,
+    '#default_value' => variable_get('vkgroups_settings', ''),
+  );
+  
+  $form = system_settings_form($form);
+  $form['#submit'] = array('vkgroups_settings_form_submit');
+  
+  return $form;
+}
+
+function vkgroups_settings_form_submit($form, $form_state) {
+  
+  variable_set('vkgroups_settings', $form_state['input']['settings']);
+}
+
+function vkgroups_block_info(){
+  $blocks = array();
+  
+  $blocks['vkgroups'] = array(
+    'info' => t('VK Groups Widget'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  
+  return $blocks;
+}
+
+function vkgroups_block_view($delta = ''){
+  $block = array();
+  switch ($delta){
+  case 'vkgroups':
+    $block['subject'] = '<none>';
+    $block['content'] = theme('vkgroups');
+    break;
+  }
+  return $block;
+}
+
+function vkgroups_theme($existing, $type, $theme, $path){
+  $themes = array();
+  $themes['vkgroups'] = array('template' => 'vkgroups');
+  return $themes;
+}
+
+function template_preprocess_vkgroups(&$vars) {
+  $vars['data'] = variable_get('vkgroups_settings', '');
+}

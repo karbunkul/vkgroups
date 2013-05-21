@@ -1,0 +1,5 @@
+name = VK Groups Widget
+description = The groups widget links your site with a corresponding community on VK
+core = 7.x
+version = 1.0-dev
+package = Karbunkul
